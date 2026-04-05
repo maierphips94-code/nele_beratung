@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f4f1eb;
+  color: #2c302e;
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Font utilities */
+.font-display,
+.font-serif,
+.font-headline {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Glass overlay – used on service cards */
+.glass-overlay {
+  background: rgba(244, 241, 235, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #f4f1eb; }
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 163, 141, 0.4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: #8ba38d; }
+
+/* Animated underline links */
+.animated-link { position: relative; text-decoration: none; }
+.animated-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: #8ba38d;
+  transition: width 0.3s ease;
+}
+.animated-link:hover::after { width: 100%; }

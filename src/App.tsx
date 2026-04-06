@@ -16,7 +16,7 @@ function ScrollToTop() {
       // Wait for page render, then scroll to anchor
       setTimeout(() => {
         const el = document.querySelector(hash)
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' })
       }, 80)
     } else {
       window.scrollTo(0, 0)

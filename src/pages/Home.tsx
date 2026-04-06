@@ -1,34 +1,153 @@
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
+import { motion, useMotionValue, animate } from 'framer-motion'
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import FadeIn from '../components/FadeIn'
+
+const testimonials = [
+  {
+    text: 'Die Sitzungen mit Nele haben mir geholfen, Muster in meinem Verhalten zu erkennen, die ich jahrelang nicht sehen konnte. Ich gehe gestärkt und mit neuer Klarheit aus jedem Gespräch heraus.',
+    name: 'Katharina M.',
+    role: 'Einzelberatung',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80',
+  },
+  {
+    text: 'Wir haben die Paarberatung in einer sehr schwierigen Phase begonnen. Nele hat uns einen Raum gegeben, in dem wir wirklich miteinander sprechen konnten – ohne Vorwürfe, mit echtem Gehör.',
+    name: 'Thomas & Julia S.',
+    role: 'Paarberatung',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
+  },
+  {
+    text: 'Das systemische Coaching hat mir bei einem wichtigen Karrierewechsel geholfen. Nele stellt die richtigen Fragen – unbequem, aber immer wertschätzend. Ich bin sehr dankbar.',
+    name: 'Markus R.',
+    role: 'Systemisches Coaching',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80',
+  },
+  {
+    text: 'Ich war skeptisch gegenüber Online-Beratung, aber die Atmosphäre war sofort vertrauensvoll. Nele schafft es, auch über den Bildschirm eine echte Verbindung herzustellen.',
+    name: 'Sophie L.',
+    role: 'Einzelberatung',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80',
+  },
+]
 
 const serviceCards = [
   {
-    title: 'Einzel- & Paarberatung',
+    title: 'Einzelberatung',
     description:
-      'Entdecken Sie die unbewussten Muster, die Ihre Entscheidungen prägen. Ein geschützter Raum für systemische Tiefe und authentische Veränderung.',
+      'Ein geschützter Raum, der nur Ihnen gehört. Wir erkunden gemeinsam, was Sie bewegt, bremst oder antreibt, um passgenaue Lösungen für Ihre aktuelle Lebenssituation zu gestalten.',
     image: './service-cards/einzelberatung.jpg',
     href: '/leistungen',
     arrowStyle: 'bg-primary/20 hover:bg-primary hover:text-white text-text-main-light',
   },
   {
-    title: 'Systemisches Coaching',
+    title: 'Paarberatung',
     description:
-      'Wir analysieren Ihre beruflichen und persönlichen Strukturen, um sicherzustellen, dass sie Ihre Energie nähren statt aufzehren.',
-    image: './service-cards/coaching.jpg',
-    href: '/leistungen#coaching',
+      'Ein vertrauensvolles Setting ermöglicht es Ihnen und ihre*m Partner*in in herausfordernden Zeiten, Ihre Beziehung aus neuen Perspektiven zu betrachten. So können destruktive Muster durchbrochen und eine neue Basis geschaffen werden.',
+    image: './service-cards/paarberatung.jpg',
+    href: '/leistungen',
     arrowStyle: 'bg-primary text-white hover:bg-opacity-90',
   },
   {
-    title: 'Aufstellung & Teams',
+    title: 'Systemaufstellung Live',
     description:
-      'Intensive Begleitformate an kraftvollen Orten – für echten Durchbruch und nachhaltige Erneuerung in Gruppen und Organisationen.',
+      'Manchmal lassen sich festgefahrene Situationen allein durch Nachdenken nicht lösen. Systemaufstellung Live nutzt die Gruppe als kraftvolles Instrument, um verborgene Verstrickungen und Blockaden im Raum sichtbar zu machen.',
     image: './service-cards/aufstellung.jpg',
-    href: '/fuer-unternehmen',
+    href: '/leistungen',
     arrowStyle: 'bg-text-main-light text-white hover:opacity-90',
   },
 ]
+
+function TestimonialsCarousel() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [dragWidth, setDragWidth] = useState(0)
+  const x = useMotionValue(0)
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setDragWidth(containerRef.current.scrollWidth - containerRef.current.offsetWidth)
+    }
+  }, [])
+
+  const scrollTo = (dir: 'left' | 'right') => {
+    const containerWidth = containerRef.current?.offsetWidth || 0
+    const currentX = x.get()
+    let newX = dir === 'left' ? currentX + containerWidth * 0.75 : currentX - containerWidth * 0.75
+    newX = Math.max(Math.min(newX, 0), -dragWidth)
+    animate(x, newX, { type: 'spring', stiffness: 300, damping: 30 })
+  }
+
+  return (
+    <div className="relative group/slider -mx-6 px-6">
+      {/* Arrow left */}
+      <div className="absolute top-1/2 -translate-y-1/2 left-0 z-20 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300">
+        <button
+          onClick={() => scrollTo('left')}
+          className="w-11 h-11 rounded-full bg-white/90 backdrop-blur-sm border border-text-main-light/10 shadow-lg flex items-center justify-center hover:scale-110 hover:border-primary hover:text-primary transition-all text-text-muted-light"
+          aria-label="Zurück"
+        >
+          <ChevronLeft size={20} />
+        </button>
+      </div>
+
+      {/* Arrow right */}
+      <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300">
+        <button
+          onClick={() => scrollTo('right')}
+          className="w-11 h-11 rounded-full bg-white/90 backdrop-blur-sm border border-text-main-light/10 shadow-lg flex items-center justify-center hover:scale-110 hover:border-primary hover:text-primary transition-all text-text-muted-light"
+          aria-label="Weiter"
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+
+      {/* Track */}
+      <motion.div
+        ref={containerRef}
+        className="overflow-hidden cursor-grab active:cursor-grabbing pt-8 pb-4"
+        whileTap={{ cursor: 'grabbing' }}
+      >
+        <motion.div
+          drag="x"
+          dragConstraints={{ right: 0, left: -dragWidth }}
+          dragElastic={0.08}
+          style={{ x }}
+          className="flex gap-6"
+        >
+          {testimonials.map((t, i) => (
+            <motion.div
+              key={i}
+              className="min-w-[320px] max-w-[320px]"
+              whileHover={{ y: -6, transition: { duration: 0.25 } }}
+            >
+              <motion.div
+                className="relative h-[320px] overflow-hidden rounded-[30px] bg-white border border-text-main-light/8 shadow-sm p-8 flex flex-col justify-between"
+                whileHover={{ boxShadow: '0 16px 40px -8px rgba(0,0,0,0.10)' }}
+                transition={{ duration: 0.3 }}
+              >
+                <p className="font-display text-base italic text-text-main-light leading-relaxed">
+                  „{t.text}"
+                </p>
+
+                <div className="pt-4 border-t border-text-main-light/8 flex items-center gap-3">
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    className="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-text-main-light leading-tight">{t.name}</p>
+                    <p className="text-xs text-text-muted-light uppercase tracking-wider mt-0.5">{t.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
 
 export default function Home() {
   return (
@@ -48,35 +167,34 @@ export default function Home() {
         <div className="absolute inset-0 bg-text-main-light/55" />
 
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-6 py-32">
+        <div className="relative z-10 container mx-auto px-6 py-40">
           <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="inline-block px-4 py-1 mb-6 rounded-full bg-white/20 backdrop-blur-sm text-xs font-semibold tracking-wider text-white uppercase"
+              className="block mb-12 text-xs font-semibold tracking-wider text-white/70 uppercase"
             >
-              Systemische Beratung & Coaching
+              Systemische Beratung & Coaching · München
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-6xl lg:text-7xl leading-tight mb-6 italic text-white"
+              className="font-display text-6xl lg:text-7xl leading-tight mb-12 italic text-white"
             >
-              Ihr Raum<br/>
-              für echte<br/>
-              Veränderung.
+              Ihr Raum für<br/>
+              echte Veränderung.
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.5 }}
-              className="text-lg text-white/70 mb-10 max-w-lg leading-relaxed"
+              className="text-lg text-white/70 mb-16 max-w-lg leading-relaxed"
             >
-              Professionelle systemische Beratung für Einzelpersonen, Paare und Teams. Nele Stein begleitet Sie dabei, Klarheit zu gewinnen und authentische Veränderung zu gestalten.
+              Professionelle systemische Online-Beratung für Einzelpersonen, Paare und Teams. Gewinnen Sie Klarheit, Perspektiven und Selbstwirksamkeit – ganz persönlich.
             </motion.p>
 
             <motion.div
@@ -178,10 +296,12 @@ export default function Home() {
                 className="w-full h-64 object-cover rounded-[30px] shadow-md"
                 loading="lazy"
               />
-              <div className="bg-primary/20 rounded-[30px] p-8 flex flex-col justify-center h-48">
-                <span className="font-display text-4xl italic text-text-main-light mb-2">10+</span>
-                <span className="text-xs font-semibold tracking-wider text-text-muted-light uppercase">Jahre Erfahrung</span>
-              </div>
+              <img
+                src="https://www.radiogong.de/01_SHUTTERSTOCK/München/2711428/image-thumb__2711428__gallery-image/Isar%20im%20Sommer.037ee94f.jpg"
+                alt="München – Isar im Sommer"
+                className="w-full h-48 object-cover rounded-[30px] shadow-md"
+                loading="lazy"
+              />
             </div>
             {/* Right column – offset */}
             <div className="pt-12">
@@ -204,16 +324,16 @@ export default function Home() {
           </FadeIn>
           <FadeIn delay={0.2}>
             <h2 className="font-display text-5xl mb-8 italic text-text-main-light leading-tight">
-              Die Weisheit von Systemen, angewendet auf den menschlichen Geist.
+              Mit Empathie und Weitblick an Ihrer Seite.
             </h2>
           </FadeIn>
           <FadeIn delay={0.3}>
             <div className="space-y-6 text-text-muted-light leading-relaxed">
               <p>
-                Ich glaube daran, dass kein Problem im Vakuum existiert. Indem wir die Wurzeln unserer Interaktionen betrachten – ob innere oder äußere – schaffen wir Veränderungen, die nicht nur wirksam, sondern nachhaltig sind.
+                Was mich antreibt? Menschen dabei zu unterstützen, über sich hinauszuwachsen. Seit sieben Jahren arbeite ich intensiv mit Menschen in verschiedensten Lebens- und Arbeitswelten zusammen. Diese vielfältige Erfahrung im professionellen Miteinander bildet das Fundament meiner heutigen Beratung: Ich begleite Sie dabei, destruktive Muster zu durchbrechen und Ihre individuellen Stärken (wieder) voll zu entfalten.
               </p>
               <p>
-                Als systemische Beraterin und Coach verbinde ich klinisch-psychologische Methodik mit tiefem Verständnis von Systemtheorie für eine wirklich einzigartige Beratungserfahrung.
+                Ich verstehe mich als Ermutigerin und Impulsgeberin. Meinen Klienten begegne ich mit Offenheit und Kreativität – Qualitäten, die ich auch als leidenschaftliche Reiterin schätze und die mir helfen, selbst in schwierigen Situationen stets einen kühlen Kopf und eine positive Ausrichtung zu bewahren.
               </p>
             </div>
           </FadeIn>
@@ -221,12 +341,26 @@ export default function Home() {
             <div className="mt-10">
               <Link
                 to="/ueber-mich"
-                className="bg-primary/20 text-text-main-light hover:bg-primary hover:text-white font-medium py-3 px-8 rounded-full transition-all uppercase tracking-wider text-sm inline-block"
+                className="group inline-flex items-center gap-2 bg-primary/20 text-text-main-light hover:bg-primary hover:text-white font-medium py-3 px-8 rounded-full transition-all uppercase tracking-wider text-sm"
               >
                 Mehr über mich
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */}
+      <section className="bg-surface-light pt-24 pb-36">
+        <div className="container mx-auto px-6">
+          <FadeIn>
+            <div className="text-center mb-14 max-w-2xl mx-auto">
+              <div className="text-xs font-semibold tracking-wider text-text-muted-light uppercase mb-4">Stimmen</div>
+              <h2 className="font-display text-5xl italic text-text-main-light">Was Klienten sagen</h2>
+            </div>
+          </FadeIn>
+          <TestimonialsCarousel />
         </div>
       </section>
 
@@ -241,22 +375,13 @@ export default function Home() {
               <p className="text-white/80 mb-8 max-w-xl mx-auto leading-relaxed">
                 Bereit zu erkunden, wie systemische Beratung Ihre Welt verändern kann? Das kostenlose Erstgespräch (30 Min.) ist der erste Schritt.
               </p>
-              <form
-                className="flex flex-col sm:flex-row max-w-2xl mx-auto gap-4"
-                onSubmit={(e) => { e.preventDefault(); window.location.href = '#/kontakt' }}
+              <Link
+                to="/kontakt"
+                className="inline-flex items-center gap-2 bg-white text-text-main-light font-bold py-3 px-8 rounded-full hover:bg-opacity-90 transition-all uppercase tracking-wider text-sm shadow-md"
               >
-                <input
-                  className="flex-grow bg-white/50 border-none rounded-full px-6 py-3 text-text-main-light placeholder-text-main-light/60 focus:ring-2 focus:ring-text-main-light/20 outline-none backdrop-blur-sm"
-                  placeholder="Ihre E-Mail-Adresse"
-                  type="email"
-                />
-                <Link
-                  to="/kontakt"
-                  className="bg-white text-text-main-light font-bold py-3 px-8 rounded-full hover:bg-opacity-90 transition-all uppercase tracking-wider text-sm whitespace-nowrap shadow-md text-center"
-                >
-                  Gespräch anfragen
-                </Link>
-              </form>
+                Gespräch anfragen
+                <ArrowRight size={14} />
+              </Link>
               <p className="text-xs text-white/60 uppercase tracking-widest mt-6 font-medium">
                 Antwort innerhalb von 1–2 Werktagen
               </p>

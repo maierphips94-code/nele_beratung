@@ -16,7 +16,7 @@ export default function Footer() {
           Nele Stein
         </span>
         <span className="text-[10px] tracking-[0.12em] uppercase font-medium text-text-muted-light">
-          Beratung & Coaching
+          Systemische Beratung & Coaching
         </span>
       </div>
       <div className="flex flex-wrap justify-center gap-8 mb-12">

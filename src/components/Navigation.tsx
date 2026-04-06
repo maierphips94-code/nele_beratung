@@ -56,7 +56,7 @@ export default function Navigation() {
             <span className={`text-[10px] tracking-[0.12em] uppercase font-medium transition-colors duration-300 ${
               isHeroMode ? 'text-white/50' : 'text-text-muted-light'
             }`}>
-              Beratung & Coaching
+              Systemische Beratung & Coaching
             </span>
           </Link>
 

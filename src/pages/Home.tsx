@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useMotionValue, animate } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import FadeIn from '../components/FadeIn'
 
@@ -60,32 +60,11 @@ const serviceCards = [
 
 function TestimonialsCarousel() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const innerRef = useRef<HTMLDivElement>(null)
-  const [dragWidth, setDragWidth] = useState(0)
-  const x = useMotionValue(0)
 
-  const calcDragWidth = () => {
-    if (containerRef.current) {
-      const containerW = containerRef.current.offsetWidth
-      const scrollable = containerRef.current.scrollWidth - containerW
-      const isMobile = containerW < 768
-      const extra = isMobile ? Math.max(0, containerW / 2 - 160) : 0
-      setDragWidth(Math.max(0, scrollable + extra))
-    }
-  }
-
-  useEffect(() => {
-    calcDragWidth()
-    window.addEventListener('resize', calcDragWidth)
-    return () => window.removeEventListener('resize', calcDragWidth)
-  }, [])
-
-  const scrollTo = (dir: 'left' | 'right') => {
-    const containerWidth = containerRef.current?.offsetWidth || 0
-    const currentX = x.get()
-    let newX = dir === 'left' ? currentX + containerWidth * 0.75 : currentX - containerWidth * 0.75
-    newX = Math.max(Math.min(newX, 0), -dragWidth)
-    animate(x, newX, { type: 'spring', stiffness: 300, damping: 30 })
+  const scrollBy = (dir: 'left' | 'right') => {
+    const el = containerRef.current
+    if (!el) return
+    el.scrollBy({ left: dir === 'right' ? el.offsetWidth * 0.75 : -(el.offsetWidth * 0.75), behavior: 'smooth' })
   }
 
   return (
@@ -93,7 +72,7 @@ function TestimonialsCarousel() {
       {/* Arrow left */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 z-20 opacity-100 md:opacity-0 md:group-hover/slider:opacity-100 transition-opacity duration-300">
         <button
-          onClick={() => scrollTo('left')}
+          onClick={() => scrollBy('left')}
           className="w-11 h-11 rounded-full bg-white/90 backdrop-blur-sm border border-text-main-light/10 shadow-lg flex items-center justify-center hover:scale-110 hover:border-primary hover:text-primary transition-all text-text-muted-light"
           aria-label="Zurück"
         >
@@ -104,7 +83,7 @@ function TestimonialsCarousel() {
       {/* Arrow right */}
       <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 opacity-100 md:opacity-0 md:group-hover/slider:opacity-100 transition-opacity duration-300">
         <button
-          onClick={() => scrollTo('right')}
+          onClick={() => scrollBy('right')}
           className="w-11 h-11 rounded-full bg-white/90 backdrop-blur-sm border border-text-main-light/10 shadow-lg flex items-center justify-center hover:scale-110 hover:border-primary hover:text-primary transition-all text-text-muted-light"
           aria-label="Weiter"
         >
@@ -112,49 +91,38 @@ function TestimonialsCarousel() {
         </button>
       </div>
 
-      {/* Track */}
-      <motion.div
+      {/* Track – native scroll for reliable touch on all mobile browsers */}
+      <div
         ref={containerRef}
-        className="overflow-hidden cursor-grab active:cursor-grabbing pt-8 pb-4"
-        whileTap={{ cursor: 'grabbing' }}
+        className="overflow-x-auto snap-x snap-mandatory pt-8 pb-4 flex gap-6 [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: 'none' }}
       >
-        <motion.div
-          ref={innerRef}
-          drag="x"
-          dragConstraints={{ right: 0, left: -dragWidth }}
-          dragElastic={0.08}
-          style={{ x, touchAction: 'pan-y' }}
-          className="flex gap-6"
-        >
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              className="min-w-[320px] max-w-[320px]"
-              whileHover={{ y: -6, transition: { duration: 0.25 } }}
-            >
-              <div
-                className="relative h-[320px] overflow-hidden rounded-[30px] bg-background-light p-8 flex flex-col justify-between"
-              >
-                <p className="font-display text-base italic text-text-main-light leading-relaxed">
-                  „{t.text}"
-                </p>
+        {testimonials.map((t, i) => (
+          <motion.div
+            key={i}
+            className="snap-start min-w-[320px] max-w-[320px]"
+            whileHover={{ y: -6, transition: { duration: 0.25 } }}
+          >
+            <div className="relative h-[320px] overflow-hidden rounded-[30px] bg-background-light p-8 flex flex-col justify-between">
+              <p className="font-display text-base italic text-text-main-light leading-relaxed">
+                „{t.text}"
+              </p>
 
-                <div className="pt-4 border-t border-text-main-light/8 flex items-center gap-3">
-                  <img
-                    src={t.avatar}
-                    alt={t.name}
-                    className="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-text-main-light leading-tight">{t.name}</p>
-                    <p className="text-xs text-text-muted-light uppercase tracking-wider mt-0.5">{t.role}</p>
-                  </div>
+              <div className="pt-4 border-t border-text-main-light/8 flex items-center gap-3">
+                <img
+                  src={t.avatar}
+                  alt={t.name}
+                  className="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-text-main-light leading-tight">{t.name}</p>
+                  <p className="text-xs text-text-muted-light uppercase tracking-wider mt-0.5">{t.role}</p>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
     </div>
   )
 }

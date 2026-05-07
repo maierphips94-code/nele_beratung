@@ -60,12 +60,16 @@ const serviceCards = [
 
 function TestimonialsCarousel() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
   const [dragWidth, setDragWidth] = useState(0)
   const x = useMotionValue(0)
 
   const calcDragWidth = () => {
-    if (containerRef.current) {
-      setDragWidth(containerRef.current.scrollWidth - containerRef.current.offsetWidth)
+    if (containerRef.current && innerRef.current) {
+      const containerW = containerRef.current.offsetWidth
+      const innerW = innerRef.current.offsetWidth
+      const extra = Math.max(0, containerW / 2 - 160)
+      setDragWidth(Math.max(0, innerW - containerW + extra))
     }
   }
 
@@ -111,9 +115,11 @@ function TestimonialsCarousel() {
       <motion.div
         ref={containerRef}
         className="overflow-hidden cursor-grab active:cursor-grabbing pt-8 pb-4"
+        style={{ touchAction: 'pan-y' }}
         whileTap={{ cursor: 'grabbing' }}
       >
         <motion.div
+          ref={innerRef}
           drag="x"
           dragConstraints={{ right: 0, left: -dragWidth }}
           dragElastic={0.08}

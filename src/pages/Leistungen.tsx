@@ -153,7 +153,7 @@ export default function Leistungen() {
                     {/* Price */}
                     <div className="flex items-baseline gap-3 py-4 border-t border-b border-text-main-light/10 mb-6">
                       <span className="font-display text-2xl italic text-text-main-light whitespace-nowrap">{service.price.amount}</span>
-                      <span className="text-sm text-text-muted-light">{service.price.unit}</span>
+                      <span className="text-xs text-text-muted-light">{service.price.unit}</span>
                     </div>
 
                     {/* CTA – always at bottom */}

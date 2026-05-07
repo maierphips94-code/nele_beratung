@@ -68,7 +68,8 @@ function TestimonialsCarousel() {
     if (containerRef.current && innerRef.current) {
       const containerW = containerRef.current.offsetWidth
       const innerW = innerRef.current.offsetWidth
-      const extra = Math.max(0, containerW / 2 - 160)
+      const isMobile = containerW < 768
+      const extra = isMobile ? Math.max(0, containerW / 2 - 160) : 0
       setDragWidth(Math.max(0, innerW - containerW + extra))
     }
   }
@@ -115,7 +116,6 @@ function TestimonialsCarousel() {
       <motion.div
         ref={containerRef}
         className="overflow-hidden cursor-grab active:cursor-grabbing pt-8 pb-4"
-        style={{ touchAction: 'pan-y' }}
         whileTap={{ cursor: 'grabbing' }}
       >
         <motion.div

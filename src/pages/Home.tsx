@@ -65,12 +65,12 @@ function TestimonialsCarousel() {
   const x = useMotionValue(0)
 
   const calcDragWidth = () => {
-    if (containerRef.current && innerRef.current) {
+    if (containerRef.current) {
       const containerW = containerRef.current.offsetWidth
-      const innerW = innerRef.current.offsetWidth
+      const scrollable = containerRef.current.scrollWidth - containerW
       const isMobile = containerW < 768
       const extra = isMobile ? Math.max(0, containerW / 2 - 160) : 0
-      setDragWidth(Math.max(0, innerW - containerW + extra))
+      setDragWidth(Math.max(0, scrollable + extra))
     }
   }
 

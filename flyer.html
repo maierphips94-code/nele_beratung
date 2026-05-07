@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nele Stein – Postkarte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── Tokens ─────────────────────────────────── */
+    :root {
+      --sage:         #8ba38d;
+      --sage-light:   #a3b8a5;
+      --sage-dark:    #6b8a6d;
+      --sage-pale:    #eaf0eb;
+      --cream:        #f4f1eb;
+      --cream-dk:     #ece8e1;
+      --forest:       #2c302e;
+      --forest-mid:   #4a504c;
+      --forest-muted: #6b726d;
+      --white:        #ffffff;
+
+      /* DIN A6 hochkant */
+      --w: 105mm;
+      --h: 148mm;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── Screen preview ─────────────────────────── */
+    body {
+      min-height: 100vh;
+      background: #0f110e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 32px;
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .preview-meta {
+      font-size: 8px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.18);
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .cards-row {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+    }
+
+    .card-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .side-label {
+      font-size: 7.5px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.2);
+    }
+
+    /* ─── Card base ──────────────────────────────── */
+    .card {
+      width: var(--w);
+      height: var(--h);
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 0.5px rgba(255,255,255,.05),
+        0 28px 72px rgba(0,0,0,.6),
+        0 8px 22px rgba(0,0,0,.38);
+    }
+
+    /* ════════════════════════════════════════════════
+       VORDERSEITE – visuell & emotional
+    ════════════════════════════════════════════════ */
+    .front {
+      background: var(--forest);
+    }
+
+    .front-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 8%;
+      display: block;
+    }
+
+    /* Cinematic gradient: top clear → bottom very dark */
+    .front-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(14, 18, 14, 0.97) 0%,
+        rgba(14, 18, 14, 0.82) 22%,
+        rgba(14, 18, 14, 0.42) 44%,
+        rgba(14, 18, 14, 0.10) 64%,
+        transparent 100%
+      );
+    }
+
+    /* Edge vignette */
+    .front-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse 85% 90% at 50% 40%,
+        transparent 42%,
+        rgba(8, 12, 8, .28) 100%
+      );
+    }
+
+    .front-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0 7.5mm 7mm;
+    }
+
+    .front-tagline {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 20pt;
+      color: rgba(255, 255, 255, 0.96);
+      line-height: 1.22;
+      letter-spacing: -.015em;
+      margin-bottom: 5.5mm;
+    }
+
+    .front-rule {
+      width: 16mm;
+      height: 1px;
+      background: var(--sage);
+      opacity: .72;
+      margin-bottom: 3.5mm;
+    }
+
+    .front-signature {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .front-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      font-size: 9pt;
+      color: rgba(255,255,255,.88);
+      letter-spacing: .02em;
+    }
+
+    .front-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 5.5pt;
+      color: rgba(255,255,255,.44);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .front-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--sage);
+      opacity: .6;
+      flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════════════════════
+       RÜCKSEITE – informativ & einladend
+    ════════════════════════════════════════════════ */
+    .back {
+      background: var(--cream);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Sage top accent */
+    .back-stripe {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--sage);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .back-body {
+      position: absolute;
+      inset: 4px 0 0;
+      padding: 5mm 7mm 5.5mm;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Name & Rolle ─────────────────────────── */
+    .back-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 3.5mm;
+    }
+
+    .back-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      font-size: 15.5pt;
+      color: var(--forest);
+      letter-spacing: -.02em;
+      line-height: 1;
+    }
+
+    .back-role {
+      font-size: 6pt;
+      font-weight: 400;
+      color: var(--forest-muted);
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      margin-top: 2.5px;
+    }
+
+    .back-location-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1.5px;
+    }
+
+    .back-loc-line {
+      font-size: 6pt;
+      color: var(--forest-muted);
+      font-weight: 300;
+      letter-spacing: .04em;
+      text-align: right;
+    }
+
+    /* ── Divider ─────────────────────────────── */
+    .divider {
+      height: .5px;
+      background: rgba(44,48,46,.11);
+      flex-shrink: 0;
+      margin-bottom: 0;
+    }
+
+    /* ── Section label ──────────────────────── */
+    .section-label {
+      font-size: 5.5pt;
+      font-weight: 500;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--sage-dark);
+    }
+
+    /* ── Für wen? ─────────────────────────── */
+    .fuer-wen {
+      margin-top: 3.5mm;
+      margin-bottom: 3.5mm;
+    }
+
+    .fuer-wen .section-label {
+      margin-bottom: 3mm;
+      display: block;
+    }
+
+    .fuer-wen-intro {
+      font-size: 8.5pt;
+      color: var(--forest);
+      line-height: 1.62;
+      font-weight: 300;
+      margin-bottom: 3mm;
+    }
+
+    .situation-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+    }
+
+    .situation-item {
+      display: flex;
+      align-items: baseline;
+      gap: 3mm;
+      font-size: 8pt;
+      color: var(--forest-mid);
+      line-height: 1.48;
+      font-weight: 300;
+    }
+
+    .situation-marker {
+      color: var(--sage);
+      font-size: 10pt;
+      font-weight: 600;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Warum Nele? ─────────────────────── */
+    .warum {
+      margin-top: 3.5mm;
+      margin-bottom: 3.5mm;
+    }
+
+    .warum .section-label {
+      margin-bottom: 3mm;
+      display: block;
+    }
+
+    .credential-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+    }
+
+    .credential-item {
+      display: flex;
+      align-items: baseline;
+      gap: 3mm;
+      font-size: 8pt;
+      color: var(--forest-mid);
+      line-height: 1.48;
+      font-weight: 300;
+    }
+
+    .credential-item::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--sage);
+      flex-shrink: 0;
+      position: relative;
+      top: -1px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .credential-item strong {
+      font-weight: 500;
+      color: var(--forest);
+    }
+
+    /* ── Angebote ─────────────────────────── */
+    .angebote {
+      margin-top: 3mm;
+      margin-bottom: 3.5mm;
+    }
+
+    .angebote .section-label {
+      margin-bottom: 2.5mm;
+      display: block;
+    }
+
+    .angebote-row {
+      display: flex;
+      gap: 2mm;
+    }
+
+    .angebot-pill {
+      flex: 1;
+      background: var(--white);
+      border: .5px solid rgba(139,163,141,.3);
+      border-radius: 5px;
+      padding: 2.5mm 3mm;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .angebot-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 7.5pt;
+      font-weight: 600;
+      color: var(--forest);
+      display: block;
+      line-height: 1.2;
+      margin-bottom: 1px;
+    }
+
+    .angebot-format {
+      font-size: 5.5pt;
+      color: var(--sage-dark);
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Kontakt / Erstgespräch ───────────── */
+    .kontakt-block {
+      margin-top: auto;
+      border-top: .5px solid rgba(44,48,46,.11);
+      padding-top: 3.5mm;
+    }
+
+    .erstgespraech-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3mm;
+      gap: 3mm;
+    }
+
+    .erstgespraech-label {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 9pt;
+      font-weight: 400;
+      color: var(--forest);
+      line-height: 1.3;
+    }
+
+    .erstgespraech-detail {
+      font-size: 5.5pt;
+      font-weight: 300;
+      color: var(--forest-muted);
+      letter-spacing: .04em;
+      margin-top: 1.5px;
+    }
+
+    .erstgespraech-badge {
+      flex-shrink: 0;
+      background: var(--sage-pale);
+      color: var(--sage-dark);
+      font-size: 6pt;
+      font-weight: 500;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 2.5px 8px;
+      border-radius: 100px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .contact-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5mm;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 3mm;
+      font-size: 7pt;
+      color: var(--forest-muted);
+      font-weight: 300;
+    }
+
+    .contact-row .lbl {
+      font-weight: 500;
+      color: var(--forest);
+      min-width: 11mm;
+      font-size: 7pt;
+    }
+
+    /* ─── Print ──────────────────────────────────── */
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      body {
+        background: none;
+        padding: 0;
+        margin: 0;
+        display: block;
+      }
+
+      .preview-meta,
+      .cards-row,
+      .card-wrap,
+      .side-label { display: contents; }
+
+      .card {
+        width: 105mm;
+        height: 148mm;
+        break-after: page;
+        page-break-after: always;
+        box-shadow: none;
+        display: block;
+        position: relative;
+        overflow: hidden;
+      }
+
+      @page {
+        size: 105mm 148mm;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <p class="preview-meta">Nele Stein · Postkarte DIN A6 · 105 × 148 mm · Hochkant</p>
+
+  <div class="cards-row">
+
+    <!-- ═══ VORDERSEITE ══════════════════════════ -->
+    <div class="card-wrap">
+      <div class="side-label">Vorderseite</div>
+      <div class="card front">
+        <img class="front-photo" src="nele_neu.JPG" alt="Nele Stein">
+        <div class="front-overlay"></div>
+        <div class="front-vignette"></div>
+        <div class="front-content">
+          <p class="front-tagline">
+            Was Sie suchen,<br>
+            tragen Sie bereits<br>
+            in sich.
+          </p>
+          <div class="front-rule"></div>
+          <div class="front-signature">
+            <div>
+              <div class="front-name">Nele Stein</div>
+              <div class="front-title">Systemische Beraterin &middot; München</div>
+            </div>
+            <div class="front-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RÜCKSEITE ════════════════════════════ -->
+    <div class="card-wrap">
+      <div class="side-label">Rückseite</div>
+      <div class="card back">
+
+        <div class="back-stripe"></div>
+        <div class="back-body">
+
+          <!-- Name & Rolle -->
+          <div class="back-header">
+            <div>
+              <div class="back-name">Nele Stein</div>
+              <div class="back-role">Systemische Beraterin · SG</div>
+            </div>
+            <div class="back-location-badge">
+              <span class="back-loc-line">München</span>
+              <span class="back-loc-line">Online deutschlandweit</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Für wen? -->
+          <div class="fuer-wen">
+            <span class="section-label">Systemische Beratung – für wen?</span>
+            <p class="fuer-wen-intro">
+              Systemische Beratung begleitet Menschen, die spüren, dass etwas
+              anders werden muss – aber noch nicht wissen, wie.
+            </p>
+            <ul class="situation-list">
+              <li class="situation-item">
+                <span class="situation-marker">–</span>
+                <span>Sie stehen vor einer wichtigen Entscheidung und suchen Klarheit über den nächsten Schritt.</span>
+              </li>
+              <li class="situation-item">
+                <span class="situation-marker">–</span>
+                <span>Beruflich oder privat geht es gerade nicht weiter – und die Ursache bleibt unklar.</span>
+              </li>
+              <li class="situation-item">
+                <span class="situation-marker">–</span>
+                <span>Sie drehen sich im Kreis und fallen immer wieder in dieselben Muster zurück.</span>
+              </li>
+              <li class="situation-item">
+                <span class="situation-marker">–</span>
+                <span>Als Paar verlieren Sie die gemeinsame Sprache und suchen neuen Boden.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Warum Nele? -->
+          <div class="warum">
+            <span class="section-label">Warum Nele?</span>
+            <ul class="credential-list">
+              <li class="credential-item">
+                <strong>7 Jahre Erfahrung</strong> in verschiedensten Lebens- und Arbeitswelten
+              </li>
+              <li class="credential-item">
+                <strong>Zertifiziert</strong> nach Systemischer Gesellschaft (SG)
+              </li>
+              <li class="credential-item">
+                <strong>Ressourcenorientiert:</strong> Ihre Stärken stehen im Mittelpunkt, nicht Ihre Defizite
+              </li>
+              <li class="credential-item">
+                <strong>Allparteilich</strong> und neutral – ein Raum ohne Wertung
+              </li>
+            </ul>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Angebote -->
+          <div class="angebote">
+            <span class="section-label">Angebote · Alle online</span>
+            <div class="angebote-row">
+              <div class="angebot-pill">
+                <span class="angebot-name">Einzel&shy;beratung</span>
+                <span class="angebot-format">60 Min.</span>
+              </div>
+              <div class="angebot-pill">
+                <span class="angebot-name">Paar&shy;beratung</span>
+                <span class="angebot-format">75–90 Min.</span>
+              </div>
+              <div class="angebot-pill">
+                <span class="angebot-name">Systemisches Coaching</span>
+                <span class="angebot-format">60 Min.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kontakt / Erstgespräch -->
+          <div class="kontakt-block">
+            <div class="erstgespraech-row">
+              <div>
+                <div class="erstgespraech-label">Kostenloses Erstgespräch</div>
+                <div class="erstgespraech-detail">20 Min. · Unverbindlich · Online via Video-Call</div>
+              </div>
+              <div class="erstgespraech-badge">Kostenlos</div>
+            </div>
+            <div class="contact-rows">
+              <div class="contact-row">
+                <span class="lbl">Web</span>
+                <span>www.[ihre-domain].de</span>
+              </div>
+              <div class="contact-row">
+                <span class="lbl">E-Mail</span>
+                <span>hallo@[ihre-domain].de</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
